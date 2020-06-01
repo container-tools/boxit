@@ -14,5 +14,6 @@ require (
 
 replace (
 	github.com/apache/camel-k/pkg/apis/camel => github.com/apache/camel-k/pkg/apis/camel v0.0.0-20200529095204-31c39d23e408
+	github.com/apache/camel-k/pkg/client/camel => github.com/apache/camel-k/pkg/client/camel v0.0.0-20200529095204-31c39d23e408
 	github.com/nicolaferraro/boxnet/api => ../api
 )
