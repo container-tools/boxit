@@ -1,0 +1,11 @@
+.project
+.metadata
+
+.idea
+*.iml
+
+.envrc
+
+/boxnet
+/boxnet-server
+
