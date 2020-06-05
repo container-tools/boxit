@@ -1,7 +1,7 @@
-module github.com/nicolaferraro/boxnet/client
+module github.com/container-tools/boxit/client
 
 go 1.13
 
-require github.com/nicolaferraro/boxnet/api v0.0.0
+require github.com/container-tools/boxit/api v0.0.0
 
-replace github.com/nicolaferraro/boxnet/api => ../api
+replace github.com/container-tools/boxit/api => ../api

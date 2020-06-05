@@ -6,6 +6,5 @@
 
 .envrc
 
-/boxnet
-/boxnet-server
-
+/boxit
+/boxit-server

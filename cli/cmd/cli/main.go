@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/nicolaferraro/boxnet/cli/cmd/commands"
+	"github.com/container-tools/boxit/cli/cmd/commands"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -10,8 +10,8 @@ import (
 func main() {
 
 	var cmd = cobra.Command{
-		Use:   "boxnet",
-		Short: "Boxnet is a client tool for accessing the boxnet",
+		Use:   "boxit",
+		Short: "Boxit is a client tool for accessing the boxit network",
 	}
 
 	cmd.AddCommand(commands.NewCmdCreate())

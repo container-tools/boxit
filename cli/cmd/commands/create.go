@@ -2,8 +2,8 @@ package commands
 
 import (
 	"fmt"
-	"github.com/nicolaferraro/boxnet/api"
-	"github.com/nicolaferraro/boxnet/client"
+	"github.com/container-tools/boxit/api"
+	"github.com/container-tools/boxit/client"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ func NewCmdCreate() *cobra.Command {
 
 	cmd := cobra.Command{
 		Use:   "create",
-		Short: "Creates or returns the address of a boxnet image",
+		Short: "Creates or returns the address of a boxit image",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c := client.New()
 			img := api.Image{

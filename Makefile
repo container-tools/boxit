@@ -10,7 +10,7 @@ build-client:
 	cd client && go build ./...
 
 build-server:
-	cd server && go build -o ../boxnet-server ./cmd/server
+	cd server && go build -o ../boxit-server ./cmd/server
 
 build-cli:
-	cd cli && go build -o ../boxnet ./cmd/cli
+	cd cli && go build -o ../boxit ./cmd/cli

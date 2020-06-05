@@ -4,27 +4,27 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/nicolaferraro/boxnet/api"
+	"github.com/container-tools/boxit/api"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
-type BoxnetClient struct {
+type BoxitClient struct {
 	server string
 }
 
-func New() *BoxnetClient {
+func New() *BoxitClient {
 	return NewWithServer(api.DefaultServer)
 }
 
-func NewWithServer(server string) *BoxnetClient {
-	return &BoxnetClient{
+func NewWithServer(server string) *BoxitClient {
+	return &BoxitClient{
 		server: server,
 	}
 }
 
-func (c *BoxnetClient) Create(img api.Image) (string, error) {
+func (c *BoxitClient) Create(img api.Image) (string, error) {
 	data, err := json.Marshal(img)
 	if err != nil {
 		return "", err
