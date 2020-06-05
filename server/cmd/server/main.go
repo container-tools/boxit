@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	v1 "github.com/apache/camel-k/pkg/apis/camel/v1"
 	"github.com/container-tools/boxit/api"
@@ -20,6 +21,8 @@ import (
 var namespace string
 var client *camelclient.Clientset
 
+const buildFailure = "image build failed"
+
 func main() {
 	namespace = os.Getenv("NAMESPACE")
 	if namespace == "" {
@@ -31,7 +34,7 @@ func main() {
 
 	http.HandleFunc("/images", require)
 
-	port := 8081
+	port := 8080
 	log.Printf("Server listening on port %d...\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }
@@ -71,7 +74,11 @@ func require(res http.ResponseWriter, req *http.Request) {
 	imageName, err := findFinalImage(img)
 	if err != nil {
 		log.Printf("Error during build creation: %v", err)
-		res.WriteHeader(500)
+		if err.Error() == buildFailure {
+			res.WriteHeader(400)
+		} else {
+			res.WriteHeader(500)
+		}
 		return
 	}
 
@@ -118,6 +125,9 @@ func findFinalImage(img api.Image) (string, error) {
 		if err != nil && k8serrors.IsNotFound(err) {
 			time.Sleep(1 * time.Second)
 			continue
+		}
+		if build.Status.Phase == v1.BuildPhaseError {
+			return "", errors.New("image build failed")
 		}
 		if build.Status.Image == "" {
 			time.Sleep(1 * time.Second)
