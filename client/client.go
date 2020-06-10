@@ -24,21 +24,25 @@ func NewWithServer(server string) *BoxitClient {
 	}
 }
 
-func (c *BoxitClient) Create(img api.Image) (string, error) {
+func (c *BoxitClient) Create(img api.ImageRequest) (api.ImageResult, error) {
 	data, err := json.Marshal(img)
 	if err != nil {
-		return "", err
+		return api.ImageResult{}, err
 	}
 	res, err := http.Post(fmt.Sprintf("%s/images", c.server), "application/json", bytes.NewReader(data))
 	if err != nil {
-		return "", err
+		return api.ImageResult{}, err
 	}
 	if !strings.HasPrefix(res.Status, "2") {
-		return "", fmt.Errorf("error returned from server: %s", res.Status)
+		return api.ImageResult{}, fmt.Errorf("error returned from server: %s", res.Status)
 	}
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return "", err
+		return api.ImageResult{}, err
 	}
-	return string(body), nil
+	var result api.ImageResult
+	if err := json.Unmarshal(body, &result); err != nil {
+		return api.ImageResult{}, err
+	}
+	return result, nil
 }

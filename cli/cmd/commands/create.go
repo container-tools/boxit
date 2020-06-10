@@ -20,7 +20,7 @@ func NewCmdCreate() *cobra.Command {
 		Short: "Creates or returns the address of a boxit image",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c := client.New()
-			img := api.Image{
+			img := api.ImageRequest{
 				Platform: api.Platform(options.Platform),
 			}
 			for _, d := range options.Dependencies {
@@ -30,7 +30,7 @@ func NewCmdCreate() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println(image)
+			fmt.Println(image.ID)
 			return nil
 		},
 	}

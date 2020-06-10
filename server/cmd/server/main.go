@@ -51,7 +51,7 @@ func require(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(400)
 		return
 	}
-	var img api.Image
+	var img api.ImageRequest
 	if err := json.Unmarshal(content, &img); err != nil {
 		log.Printf("An error occurred during unmarshal: %v", err)
 		res.WriteHeader(400)
@@ -71,7 +71,7 @@ func require(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	imageName, err := findFinalImage(img)
+	err = waitForCompletion(img)
 	if err != nil {
 		log.Printf("Error during build creation: %v", err)
 		if err.Error() == buildFailure {
@@ -82,10 +82,23 @@ func require(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	res.Write([]byte(imageName))
+	response, err := buildResponse(img)
+	if err != nil {
+		log.Printf("Error while creating response: %v", err)
+		res.WriteHeader(500)
+		return
+	}
+	resData, err := json.Marshal(response)
+	if err != nil {
+		log.Printf("Error while marshalling response: %v", err)
+		res.WriteHeader(500)
+		return
+	}
+	res.Header().Add("Content-Type", "application/json")
+	res.Write(resData)
 }
 
-func findOrCreateKit(img api.Image) (*v1.IntegrationKit, error) {
+func findOrCreateKit(img api.ImageRequest) (*v1.IntegrationKit, error) {
 	kit, err := findKit(img)
 	if err != nil && k8serrors.IsNotFound(err) {
 		return createKit(img)
@@ -93,12 +106,12 @@ func findOrCreateKit(img api.Image) (*v1.IntegrationKit, error) {
 	return kit, err
 }
 
-func findKit(img api.Image) (*v1.IntegrationKit, error) {
+func findKit(img api.ImageRequest) (*v1.IntegrationKit, error) {
 	name := img.Hash()
 	return client.CamelV1().IntegrationKits(namespace).Get(name, metav1.GetOptions{})
 }
 
-func createKit(img api.Image) (*v1.IntegrationKit, error) {
+func createKit(img api.ImageRequest) (*v1.IntegrationKit, error) {
 	name := img.Hash()
 	kit := v1.IntegrationKit{
 		ObjectMeta: metav1.ObjectMeta{
@@ -114,26 +127,42 @@ func createKit(img api.Image) (*v1.IntegrationKit, error) {
 	return client.CamelV1().IntegrationKits(namespace).Create(&kit)
 }
 
-func findFinalImage(img api.Image) (string, error) {
+func waitForCompletion(img api.ImageRequest) error {
 	// Waiting for the final image is only necessary because the tag is non-deterministic in the Camel K builder
 	// Technically we can return the final image before building it
-	name := img.Hash()
-	var err error
 	for i := 0; i < 600; i++ {
-		var build *v1.Build
-		build, err = client.CamelV1().Builds(namespace).Get(name, metav1.GetOptions{})
-		if err != nil && k8serrors.IsNotFound(err) {
+		kit, err := findKit(img)
+		if err != nil {
+			return err
+		}
+		if kit.Status.Phase == v1.IntegrationKitPhaseError {
+			return errors.New(buildFailure)
+		}
+		if kit.Status.Image == "" {
 			time.Sleep(1 * time.Second)
 			continue
 		}
-		if build.Status.Phase == v1.BuildPhaseError {
-			return "", errors.New("image build failed")
-		}
-		if build.Status.Image == "" {
-			time.Sleep(1 * time.Second)
-			continue
-		}
-		return build.Status.Image, nil
+		return nil
 	}
-	return "", err
+	return errors.New("image build is not finished yet")
+}
+
+func buildResponse(img api.ImageRequest) (api.ImageResult, error) {
+	kit, err := findKit(img)
+	if err != nil {
+		return api.ImageResult{}, err
+	}
+	res := api.ImageResult{
+		ID: kit.Status.Image,
+	}
+	for _, a := range kit.Status.Artifacts {
+		resA := api.Artifact{
+			ID:       a.ID,
+			Checksum: a.Checksum,
+			Target:   a.Target,
+			Location: a.Location,
+		}
+		res.Artifacts = append(res.Artifacts, resA)
+	}
+	return res, nil
 }

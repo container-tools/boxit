@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (img Image) Hash() string {
+func (img ImageRequest) Hash() string {
 	hash := sha256.New()
 	hash.Write([]byte(img.Platform))
 	for _, dep := range img.Dependencies {
