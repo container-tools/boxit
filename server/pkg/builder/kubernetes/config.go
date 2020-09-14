@@ -1,11 +1,12 @@
 package kubernetes
 
 import (
-	"github.com/mitchellh/go-homedir"
-	"k8s.io/client-go/rest"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/mitchellh/go-homedir"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 )
 
