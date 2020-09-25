@@ -19,8 +19,8 @@ const (
 )
 
 type Artifact struct {
-	ID       string `json:"id,omitempty"`
-	Checksum string `json:"checksum,omitempty"`
-	Target   string `json:"target,omitempty"`
+	//ID       string `json:"id,omitempty"`
+	//Checksum string `json:"checksum,omitempty"`
+	//Target   string `json:"target,omitempty"`
 	Location string `json:"location,omitempty"`
 }
