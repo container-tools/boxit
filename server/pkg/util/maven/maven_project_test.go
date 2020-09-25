@@ -20,7 +20,7 @@ package maven
 import (
 	"testing"
 
-	"github.com/apache/camel-k/pkg/util"
+	"github.com/container-tools/boxit/server/pkg/util"
 
 	"github.com/stretchr/testify/assert"
 )

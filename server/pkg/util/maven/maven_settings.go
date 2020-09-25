@@ -20,11 +20,6 @@ package maven
 import (
 	"encoding/xml"
 	"strings"
-
-	"github.com/apache/camel-k/pkg/util"
-
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // DefaultMavenRepositories is a comma separated list of default maven repositories
@@ -67,33 +62,6 @@ func NewDefaultSettings(repositories []Repository) Settings {
 	}
 
 	return settings
-}
-
-// CreateSettingsConfigMap --
-func CreateSettingsConfigMap(namespace string, name string, settings Settings) (*corev1.ConfigMap, error) {
-	data, err := util.EncodeXML(settings)
-	if err != nil {
-		return nil, err
-	}
-
-	cm := &corev1.ConfigMap{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "ConfigMap",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name + "-maven-settings",
-			Namespace: namespace,
-			Labels: map[string]string{
-				"app": "camel-k",
-			},
-		},
-		Data: map[string]string{
-			"settings.xml": string(data),
-		},
-	}
-
-	return cm, nil
 }
 
 func getDefaultMavenRepositories() (repos []Repository) {
