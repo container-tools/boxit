@@ -20,9 +20,12 @@ This will produce two binaries:
 
 ## 2. Running
 
-### 2.1 Running the registry
+### 2.1 (Optional) Running the registry
 
 Boxit needs a registry to host the produced images.
+
+You can either run a local registry or use an existing one (e.g. docker hub).
+
 To run a local registry using docker, you can run:
 
 ```shell
@@ -38,6 +41,19 @@ The server can be simply executed via:
 ```
 
 It runs on port `8080` and points by default to the registry on `localhost:5000` (insecure).
+
+If you want to use a different registry, make sure you're logged in:
+
+```shell
+docker login docker.io
+# follow instructions
+```
+
+Then start the server with:
+
+```shell
+./boxit-server --registry docker.io/yourid --insecure=false
+```
 
 ### 2.3 Creating images with the client
 

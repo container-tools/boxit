@@ -11,6 +11,7 @@ require (
 	github.com/opencontainers/runc v1.0.0-rc2.0.20190611121236-6cc515888830 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/scylladb/go-set v1.0.2
+	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.5.1
 )
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/container-tools/boxit/api"
+	builderapi "github.com/container-tools/boxit/server/pkg/builder/api"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 	"github.com/google/go-containerregistry/pkg/v1/remote/transport"
@@ -13,25 +14,22 @@ import (
 )
 
 const (
-	registry   = "localhost:5000"
-	repository = "boxit"
-
 	descriptorAnnotation = "boxit.descriptor"
 )
 
-func Builder(img api.ImageRequest) (api.ImageResult, error) {
-	existing, err := findExisting(img)
+func Builder(options builderapi.BuilderOptions, img api.ImageRequest) (api.ImageResult, error) {
+	existing, err := findExisting(options, img)
 	if err != nil {
 		return api.ImageResult{}, err
 	} else if existing != nil {
 		return *existing, nil
 	}
 
-	return buildNewImage(img)
+	return buildNewImage(options, img)
 }
 
-func findExisting(img api.ImageRequest) (*api.ImageResult, error) {
-	imageID := getImageID(img)
+func findExisting(options builderapi.BuilderOptions, img api.ImageRequest) (*api.ImageResult, error) {
+	imageID := getImageID(options, img)
 	ref, err := name.ParseReference(imageID)
 	if err != nil {
 		return nil, err
@@ -73,18 +71,18 @@ func findExisting(img api.ImageRequest) (*api.ImageResult, error) {
 	return &res, nil
 }
 
-func getImageID(img api.ImageRequest) string {
+func getImageID(options builderapi.BuilderOptions, img api.ImageRequest) string {
 	hash := img.Hash()
 	version := "latest"
-	return fmt.Sprintf("%s/%s/%s:%s", registry, repository, hash, version)
+	return fmt.Sprintf("%s/%s:%s", options.Registry, hash, version)
 }
 
-func buildNewImage(img api.ImageRequest) (api.ImageResult, error) {
+func buildNewImage(options builderapi.BuilderOptions, img api.ImageRequest) (api.ImageResult, error) {
 	root, path, err := mavenBuild(img)
 	if err != nil {
 		return api.ImageResult{}, err
 	}
 	defer os.RemoveAll(root)
 
-	return publish(img, filepath.Join(root, path))
+	return publish(options, img, filepath.Join(root, path))
 }

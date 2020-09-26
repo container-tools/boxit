@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/container-tools/boxit/cli/cmd/commands"
+	"github.com/container-tools/boxit/cli/pkg/commands"
 	"github.com/spf13/cobra"
 	"os"
 )

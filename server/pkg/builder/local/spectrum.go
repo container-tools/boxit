@@ -3,16 +3,15 @@ package local
 import (
 	"encoding/json"
 	"github.com/container-tools/boxit/api"
-	serverapi "github.com/container-tools/boxit/server/pkg/builder/api"
+	builderapi "github.com/container-tools/boxit/server/pkg/builder/api"
 	spectrum "github.com/container-tools/spectrum/pkg/builder"
 	"os"
 	"path/filepath"
 	"sort"
 )
 
-func publish(img api.ImageRequest, libDir string) (api.ImageResult, error) {
-	imageID := getImageID(img)
-
+func publish(options builderapi.BuilderOptions, img api.ImageRequest, libDir string) (api.ImageResult, error) {
+	imageID := getImageID(options, img)
 	res := api.ImageResult{
 		ID: imageID,
 	}
@@ -41,8 +40,8 @@ func publish(img api.ImageRequest, libDir string) (api.ImageResult, error) {
 	}
 
 	opts := spectrum.Options{
-		PushInsecure: true,
-		Base:         serverapi.BaseImage(img.Platform),
+		PushInsecure: options.Insecure,
+		Base:         builderapi.BaseImage(img.Platform),
 		Target:       imageID,
 		Stdout:       os.Stdout,
 		Stderr:       os.Stderr,

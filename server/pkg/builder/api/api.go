@@ -5,7 +5,7 @@ import (
 	"github.com/container-tools/boxit/api"
 )
 
-type Builder func(img api.ImageRequest) (api.ImageResult, error)
+type Builder func(options BuilderOptions, img api.ImageRequest) (api.ImageResult, error)
 
 const BuildFailure = "image build failed"
 
@@ -15,4 +15,9 @@ func BaseImage(platform api.Platform) string {
 		return "adoptopenjdk/openjdk11:slim"
 	}
 	panic(fmt.Sprintf("no base image defined for platform %q", platform))
+}
+
+type BuilderOptions struct {
+	Registry string
+	Insecure bool
 }
